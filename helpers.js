@@ -1,6 +1,6 @@
-/*
-*
-*/
+/**
+ * Returns a string of 6 random alphanumeric characters.
+ */
 const generateRandomString = () => {
   const numbers =  '0123456789';
   const lowerLetters = 'abcdefghijklmnopqrstuvwxyz';
@@ -9,14 +9,12 @@ const generateRandomString = () => {
 
   let result = '';
 
-  for (const char of string) {
-    if (result.length >= 6) break;
+  for (let i = 0; i < 6; i++) {
     const randomChar = string[Math.floor(Math.random() * string.length)];
     result += randomChar;
   }
 
-  console.log(result);
-  return;
+  return result;
 };
 
 generateRandomString();
