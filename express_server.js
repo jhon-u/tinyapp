@@ -84,9 +84,6 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect any request to "/u/:id" to its longURL
 app.get("/u/:id", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-  };
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
