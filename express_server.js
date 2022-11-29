@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const {generateRandomString} = require("./helpers");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -11,6 +12,7 @@ const urlDatabase = {
 
 // Middleware for POST requests
 app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
 
 // POST Route
 app.post("/urls", (req, res) => {
@@ -18,6 +20,14 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   urlDatabase[randomStr] = longURL;
   res.redirect(`/urls/${randomStr}`);
+});
+
+// Route to handle a POST to /login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  
+  res.redirect("/urls");
 });
 
 // Removes an existing shortened URLs from our database.
