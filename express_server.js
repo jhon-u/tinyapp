@@ -20,9 +20,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomStr}`);
 });
 
+// Removes existing shortened URLs from our database.
 app.post("/urls/:id/delete", (req, res) => {
-  console.log(req.body);
-  // res.redirect();
+  const id = req.params.id;
+  delete urlDatabase[id];
+  res.redirect("/urls");
 });
 
 // GET Routes
