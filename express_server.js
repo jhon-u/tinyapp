@@ -45,8 +45,6 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Updates an existing long URL in our database.
 app.post("/urls/:id", (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
   const newURL = req.body.newURL;
   const id = req.params.id;
   urlDatabase[id] = newURL;
@@ -56,7 +54,6 @@ app.post("/urls/:id", (req, res) => {
 // GET Routes
 // Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
-  console.log(req.cookies);
   const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase
