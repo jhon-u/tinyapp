@@ -29,6 +29,13 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+// Route to handle a POST to /logout
+app.post("/logout", (req, res) => {
+  const username = req.body.username;
+  res.clearCookie("username", username);
+  res.redirect("/urls");
+});
+
 // Removes an existing shortened URLs from our database.
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
