@@ -1,5 +1,5 @@
-const express = require('express');
-const {generateRandomString} = require('./helpers');
+const express = require("express");
+const {generateRandomString} = require("./helpers");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
