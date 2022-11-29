@@ -12,7 +12,7 @@ const urlDatabase = {
 
 // Middleware for POST requests
 app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // POST Route
 app.post("/urls", (req, res) => {
@@ -49,6 +49,7 @@ app.post("/urls/:id", (req, res) => {
 // GET Routes
 // Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
+  console.log(req.cookies);
   const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase
@@ -58,20 +59,27 @@ app.get("/urls", (req, res) => {
 
 // Path to add new URLs
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"],
+  };
+  res.render("urls_new", templateVars);
 });
 
 // Path to load individual shortened URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"],
   };
   res.render("urls_show", templateVars);
 });
 
 // Redirect any request to "/u/:id" to its longURL
 app.get("/u/:id", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+  };
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
