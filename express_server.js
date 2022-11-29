@@ -12,30 +12,37 @@ const urlDatabase = {
 // Middleware for POST requests
 app.use(express.urlencoded({ extended: true }));
 
-// POST Routes
+// POST Route
 app.post("/urls", (req, res) => {
   const randomStr = generateRandomString();
-  urlDatabase[randomStr] = req.body.longURL;
-  console.log(urlDatabase);
-  res.send(JSON.stringify(urlDatabase));
+  const longURL = req.body.longURL;
+  urlDatabase[randomStr] = longURL;
+  res.redirect(`/urls/${randomStr}`);
 });
 
-// GET Routes: Path to view all the shorten and long URLs
+// GET Routes
+// Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
   console.log(req.body);
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-// GET Routes: Path to add new URLs
+// Path to add new URLs
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// GET Routes: Path to load individual shortened URL
+// Path to load individual shortened URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
+});
+
+// Redirect any request to "/u/:id" to its longURL
+app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
