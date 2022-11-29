@@ -20,10 +20,14 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomStr}`);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  console.log(req.body);
+  // res.redirect();
+});
+
 // GET Routes
 // Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
-  console.log(req.body);
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
