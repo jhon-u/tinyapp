@@ -8,6 +8,8 @@ const { generateRandomString, validateFields, getUserByEmail } = require("./help
 const { users, urlDatabase } = require("./data/database");
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+
 const app = express();
 const PORT = 8080;
 app.set("view engine", "ejs");
@@ -15,6 +17,7 @@ app.set("view engine", "ejs");
 /** Middleware */
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(morgan("combined"));
 
 /** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
@@ -29,12 +32,11 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email);
-  console.log(user);
-
+  
   if (user === null) {
-    return res.status(403).send("Email already used!");
+    return res.status(403).send("Invalid Username or Password!");
   } else if (user.password !== password) {
-    return res.status(403).send("Password doesn't match!");
+    return res.status(403).send("Passwords don't match!");
   }
 
   res.cookie("user_id", user.id);
@@ -53,8 +55,9 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const isValid = validateFields(email, password);
- 
-  if (getUserByEmail(email) !== null) {
+  const user = getUserByEmail(email);
+
+  if (user !== null) {
     return res.status(400).send("Email already used!");
   }
   if (!isValid) {
@@ -99,6 +102,7 @@ app.get("/urls", (req, res) => {
 /** GET route to add new URLs. */
 app.get("/urls/new", (req, res) => {
   const user = req.cookies["user_id"];
+  if (!user) return res.redirect("/login");
   const templateVars = {
     user: users[user],
     urls: urlDatabase
@@ -126,6 +130,7 @@ app.get("/u/:id", (req, res) => {
 /** GET route to handle reqeusts to /register. */
 app.get("/register", (req, res) => {
   const user = req.cookies["user_id"];
+  if (user) return res.redirect("/urls");
   const templateVars = {
     user: users[user]
   };
@@ -135,6 +140,7 @@ app.get("/register", (req, res) => {
 /** GET route to handle reqeusts to /login. */
 app.get("/login", (req, res) => {
   const user = req.cookies["user_id"];
+  if (user) return res.redirect("/urls");
   const templateVars = {
     user: users[user]
   };
