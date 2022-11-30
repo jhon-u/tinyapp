@@ -9,14 +9,14 @@ const { users, urlDatabase } = require("./data/database");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 app.set("view engine", "ejs");
 
-// Middleware for POST requests
+/** Middleware */
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// POST Route
+/** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
@@ -24,7 +24,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomStr}`);
 });
 
-// Route to handle a POST to /login
+/** Route to handle a POST to /login. */
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -32,43 +32,33 @@ app.post("/login", (req, res) => {
   console.log(user);
 
   if (user === null) {
-    res.status(403);
-    res.send("Email already used!");
-    return;
+    return res.status(403).send("Email already used!");
   } else if (user.password !== password) {
-    res.status(403);
-    res.send("Password doesn't match!");
-    return;
+    return res.status(403).send("Password doesn't match!");
   }
 
   res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
 
-// Route to handle a POST to /logout
+/** Route to handle a POST to /logout. */
 app.post("/logout", (req, res) => {
-  const userID = req.cookies["user_id"];
-  res.clearCookie("user_id", userID);
-  res.redirect("/urls");
+  res.clearCookie("user_id");
+  res.redirect("/login");
 });
 
-// Route to handle a POST to /register
+/** Route to handle a POST to /register. */
 app.post("/register", (req, res) => {
   const userID = generateRandomString(5);
   const email = req.body.email;
   const password = req.body.password;
   const isValid = validateFields(email, password);
-  
+ 
   if (getUserByEmail(email) !== null) {
-    res.status(400);
-    res.send("Email already used!");
-    return;
+    return res.status(400).send("Email already used!");
   }
-
   if (!isValid) {
-    res.status(400);
-    res.send("Shall no pass");
-    return;
+    return res.status(400).send("Shall no pass");
   }
 
   users[userID] = {
@@ -77,20 +67,18 @@ app.post("/register", (req, res) => {
     password
   };
 
-  console.log(users);
-
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
 
-// Removes an existing shortened URLs from our database.
+/** Removes an existing shortened URLs from our database. */
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
   res.redirect("/urls");
 });
 
-// Updates an existing long URL in our database.
+/** Updates an existing long URL in our database. */
 app.post("/urls/:id", (req, res) => {
   const newURL = req.body.newURL;
   const id = req.params.id;
@@ -98,8 +86,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-// GET Routes
-// Path to view all the shorten and long URLs
+/** GET route to view all the shorten and long URLs. */
 app.get("/urls", (req, res) => {
   const user = req.cookies["user_id"];
   const templateVars = {
@@ -109,7 +96,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// Path to add new URLs
+/** GET route to add new URLs. */
 app.get("/urls/new", (req, res) => {
   const user = req.cookies["user_id"];
   const templateVars = {
@@ -119,7 +106,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// Path to load individual shortened URL
+/** GET route to load individual shortened URLs. */
 app.get("/urls/:id", (req, res) => {
   const user = req.cookies["user_id"];
   const templateVars = {
@@ -130,12 +117,13 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// Redirect any request to "/u/:id" to its longURL
+/** Redirect any request to "/u/:id" to its longURL. */
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
 
+/** GET route to handle reqeusts to /register. */
 app.get("/register", (req, res) => {
   const user = req.cookies["user_id"];
   const templateVars = {
@@ -144,6 +132,7 @@ app.get("/register", (req, res) => {
   res.render("registration", templateVars);
 });
 
+/** GET route to handle reqeusts to /login. */
 app.get("/login", (req, res) => {
   const user = req.cookies["user_id"];
   const templateVars = {
