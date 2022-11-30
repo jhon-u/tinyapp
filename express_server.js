@@ -6,7 +6,7 @@
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const {generateRandomString} = require("./helpers");
+const {generateRandomString, validateFields} = require("./helpers");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
@@ -60,6 +60,12 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString(5);
   const email = req.body.email;
   const password = req.body.password;
+  const isValid = validateFields(email, password);
+  console.log("isValid", isValid);
+  if (!isValid) {
+    res.status(400);
+    res.send("Shall no pass");
+  }
   users[userID] = {
     id: userID,
     email,
