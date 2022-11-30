@@ -17,6 +17,11 @@ const generateRandomString = () => {
   return result;
 };
 
+const validateFields = (email, password) => {
+  return false;
+};
+
 module.exports = {
-  generateRandomString
+  generateRandomString,
+  validateFields
 };
