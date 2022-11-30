@@ -28,7 +28,8 @@ app.post("/urls", (req, res) => {
   }
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
-  urlDatabase[randomStr] = longURL;
+  
+  urlDatabase[randomStr] = {longURL, user};
   res.redirect(`/urls/${randomStr}`);
 });
 
@@ -118,9 +119,10 @@ app.get("/urls/new", (req, res) => {
 /** GET route to load individual shortened URLs. */
 app.get("/urls/:id", (req, res) => {
   const user = req.cookies["user_id"];
+  const id = req.params.id;
   const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    id,
+    longURL: urlDatabase[id].longURL,
     user: users[user],
   };
   res.render("urls_show", templateVars);
@@ -129,7 +131,7 @@ app.get("/urls/:id", (req, res) => {
 /** Redirect any request to "/u/:id" to its longURL. */
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   if (!longURL) {
     res.set("Content-Type", "text/html");
     return res.send(`<h2>The short URL ${id} does not exist.</h2>`);
