@@ -26,15 +26,29 @@ app.post("/urls", (req, res) => {
 
 // Route to handle a POST to /login
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("user_id", username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = getUserByEmail(email);
+  console.log(user);
+
+  if (user === null) {
+    res.status(403);
+    res.send("Email already used!");
+    return;
+  } else if (user.password !== password) {
+    res.status(403);
+    res.send("Password doesn't match!");
+    return;
+  }
+
+  res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
 
 // Route to handle a POST to /logout
 app.post("/logout", (req, res) => {
-  const username = req.body.username;
-  res.clearCookie("user_id", username);
+  const userID = req.cookies["user_id"];
+  res.clearCookie("user_id", userID);
   res.redirect("/urls");
 });
 
@@ -128,6 +142,14 @@ app.get("/register", (req, res) => {
     user: users[user]
   };
   res.render("registration", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  const user = req.cookies["user_id"];
+  const templateVars = {
+    user: users[user]
+  };
+  res.render("login", templateVars);
 });
 
 app.listen(PORT, () => {
