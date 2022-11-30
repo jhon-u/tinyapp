@@ -16,13 +16,26 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 // Middleware for POST requests
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // POST Route
 app.post("/urls", (req, res) => {
-  const randomStr = generateRandomString();
+  const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[randomStr] = longURL;
   res.redirect(`/urls/${randomStr}`);
@@ -44,11 +57,16 @@ app.post("/logout", (req, res) => {
 
 // Route to handle a POST to /register
 app.post("/register", (req, res) => {
+  const userID = generateRandomString(5);
   const email = req.body.email;
   const password = req.body.password;
-  console.log(email, password);
-  // res.clearCookie("username", username);
-  // res.redirect("/urls");
+  users[userID] = {
+    id: userID,
+    email,
+    password
+  };
+  res.cookie("user_id", userID);
+  res.redirect("/urls");
 });
 
 // Removes an existing shortened URLs from our database.
@@ -69,8 +87,10 @@ app.post("/urls/:id", (req, res) => {
 // GET Routes
 // Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
+  console.log("COOKIE: ", req.cookies["user_id"]);
+  const user = req.cookies["user_id"];
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[user],
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
@@ -78,8 +98,9 @@ app.get("/urls", (req, res) => {
 
 // Path to add new URLs
 app.get("/urls/new", (req, res) => {
+  const user = req.cookies["user_id"];
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[user],
     urls: urlDatabase
   };
   res.render("urls_new", templateVars);
@@ -87,12 +108,12 @@ app.get("/urls/new", (req, res) => {
 
 // Path to load individual shortened URL
 app.get("/urls/:id", (req, res) => {
+  const user = req.cookies["user_id"];
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    user: users[user],
   };
-  console.log(urlDatabase[req.params.id]);
   res.render("urls_show", templateVars);
 });
 
@@ -103,8 +124,10 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  const user = req.cookies["user_id"];
+  console.log("USER", users[user]);
   const templateVars = {
-    username: req.cookies["username"]
+    user: users[user]
   };
   res.render("registration", templateVars);
 });
