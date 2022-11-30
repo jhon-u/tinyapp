@@ -4,10 +4,10 @@
  * users to shorten long URLs (à la bit.ly).
  */
 
+const { generateRandomString, validateFields, lookupUser } = require("./helpers");
+const { users, urlDatabase } = require("./data/database");
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { generateRandomString, validateFields } = require("./helpers");
-const { users, urlDatabase } = require("./data/database");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
@@ -27,14 +27,14 @@ app.post("/urls", (req, res) => {
 // Route to handle a POST to /login
 app.post("/login", (req, res) => {
   const username = req.body.username;
-  res.cookie("username", username);
+  res.cookie("user_id", username);
   res.redirect("/urls");
 });
 
 // Route to handle a POST to /logout
 app.post("/logout", (req, res) => {
   const username = req.body.username;
-  res.clearCookie("username", username);
+  res.clearCookie("user_id", username);
   res.redirect("/urls");
 });
 
@@ -44,19 +44,23 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const isValid = validateFields(email, password);
-  console.log("isValid", isValid);
-  console.log("EMAIL", email);
-  console.log("PASSWORD", password);
+  
+  if (lookupUser(email) !== null) {
+    res.status(400);
+    res.send("Email already used!");
+  }
 
   if (!isValid) {
     res.status(400);
     res.send("Shall no pass");
   }
+
   users[userID] = {
     id: userID,
     email,
     password
   };
+
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
@@ -79,7 +83,6 @@ app.post("/urls/:id", (req, res) => {
 // GET Routes
 // Path to view all the shorten and long URLs
 app.get("/urls", (req, res) => {
-  console.log("COOKIE: ", req.cookies["user_id"]);
   const user = req.cookies["user_id"];
   const templateVars = {
     user: users[user],
@@ -117,7 +120,6 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/register", (req, res) => {
   const user = req.cookies["user_id"];
-  console.log("USER", users[user]);
   const templateVars = {
     user: users[user]
   };
