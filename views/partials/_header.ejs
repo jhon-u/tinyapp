@@ -11,7 +11,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <% if(!username){ %>
+    <% if(!user){ %>
       <form class="form-inline my-2 my-lg-0" action="/login" method="post">
         <div class="form-group">
           <input name="username" class="form-control mr-sm-2" type="text" placeholder="Username" aria-label="Username">
@@ -24,7 +24,7 @@
             <span class="text-light font-weight-normal mr-4">
               Logged in as:
               <span class="text-light font-weight-bold">
-                <%= username %>
+                <%= user.email %>
               </span>
             </span>
             <button class="btn btn-light my-2 my-sm-0" type="submit">Logout</button>
