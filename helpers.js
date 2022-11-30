@@ -18,7 +18,8 @@ const generateRandomString = () => {
 };
 
 const validateFields = (email, password) => {
-  return false;
+  if (!email || !password) return false;
+  return true;
 };
 
 module.exports = {
