@@ -28,6 +28,7 @@ const validateFields = (email, password) => {
   if (!email || !password) return false;
   return true;
 };
+
 /** Returns either the entire user object or null if not found.
  * @param  {string} email
  * @returns  {(null|Object)} either the entire user object or null if not found.
