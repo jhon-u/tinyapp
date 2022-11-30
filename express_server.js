@@ -21,6 +21,11 @@ app.use(morgan("combined"));
 
 /** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
+  const user = req.cookies["user_id"];
+  if (!user) {
+    res.set("Content-Type", "text/html");
+    return res.send("<h2>You nned to be logged in to create a new URL.</h2>");
+  }
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[randomStr] = longURL;
