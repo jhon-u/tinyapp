@@ -65,6 +65,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: req.cookies["username"],
+    urls: urlDatabase
   };
   res.render("urls_new", templateVars);
 });
@@ -76,12 +77,16 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id],
     username: req.cookies["username"],
   };
+  console.log(urlDatabase[req.params.id]);
   res.render("urls_show", templateVars);
 });
 
 // Redirect any request to "/u/:id" to its longURL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
+  console.log(req.params.id);
+
+  console.log(longURL);
   res.redirect(longURL);
 });
 
