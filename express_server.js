@@ -24,7 +24,7 @@ app.post("/urls", (req, res) => {
   const user = req.cookies["user_id"];
   if (!user) {
     res.set("Content-Type", "text/html");
-    return res.send("<h2>You nned to be logged in to create a new URL.</h2>");
+    return res.send("<h2>You need to be logged in to create a new URL.</h2>");
   }
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
@@ -128,7 +128,13 @@ app.get("/urls/:id", (req, res) => {
 
 /** Redirect any request to "/u/:id" to its longURL. */
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  if (!longURL) {
+    res.set("Content-Type", "text/html");
+    return res.send(`<h2>The short URL ${id} does not exist.</h2>`);
+  }
+  
   res.redirect(longURL);
 });
 
