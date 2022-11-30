@@ -1,3 +1,9 @@
+
+/**
+ * A full stack web app built with Node and Express that allows
+ * users to shorten long URLs (à la bit.ly).
+ */
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const {generateRandomString} = require("./helpers");
@@ -34,6 +40,15 @@ app.post("/logout", (req, res) => {
   const username = req.body.username;
   res.clearCookie("username", username);
   res.redirect("/urls");
+});
+
+// Route to handle a POST to /register
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log(email, password);
+  // res.clearCookie("username", username);
+  // res.redirect("/urls");
 });
 
 // Removes an existing shortened URLs from our database.
@@ -84,10 +99,14 @@ app.get("/urls/:id", (req, res) => {
 // Redirect any request to "/u/:id" to its longURL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  console.log(req.params.id);
-
-  console.log(longURL);
   res.redirect(longURL);
+});
+
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("registration", templateVars);
 });
 
 app.listen(PORT, () => {
