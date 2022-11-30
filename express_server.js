@@ -4,7 +4,7 @@
  * users to shorten long URLs (à la bit.ly).
  */
 
-const { generateRandomString, validateFields, lookupUser } = require("./helpers");
+const { generateRandomString, validateFields, getUserByEmail } = require("./helpers");
 const { users, urlDatabase } = require("./data/database");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -45,14 +45,16 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
   const isValid = validateFields(email, password);
   
-  if (lookupUser(email) !== null) {
+  if (getUserByEmail(email) !== null) {
     res.status(400);
     res.send("Email already used!");
+    return;
   }
 
   if (!isValid) {
     res.status(400);
     res.send("Shall no pass");
+    return;
   }
 
   users[userID] = {
@@ -60,6 +62,8 @@ app.post("/register", (req, res) => {
     email,
     password
   };
+
+  console.log(users);
 
   res.cookie("user_id", userID);
   res.redirect("/urls");

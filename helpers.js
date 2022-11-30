@@ -24,17 +24,15 @@ const validateFields = (email, password) => {
   return true;
 };
 
-const lookupUser = (email) => {
+const getUserByEmail = (email) => {
   for (const user in users) {
     if (users[user].email === email) return users[user];
   }
   return null;
 };
 
-console.log(lookupUser("user2@example.com"));
-
 module.exports = {
   generateRandomString,
   validateFields,
-  lookupUser
+  getUserByEmail
 };
