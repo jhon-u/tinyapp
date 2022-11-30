@@ -12,12 +12,8 @@
       </div>
     </div>
     <% if(!user){ %>
-      <form class="form-inline my-2 my-lg-0" action="/login" method="post">
-        <div class="form-group">
-          <input name="username" class="form-control mr-sm-2" type="text" placeholder="Username" aria-label="Username">
-          <button class="btn btn-light my-2 my-sm-0" type="submit">Login</button>
-        </div>
-      </form>
+      <a class="btn btn-light mr-2 my-sm-0" href="/login" role="button">Login</a>
+      <a class="btn btn-light my-2 my-sm-0" href="/register" role="button">Register</a>
       <% } else{ %>
         <form class="form-inline my-2 my-lg-0" action="/logout" method="post">
           <div class="form-group d-inline-flex">
