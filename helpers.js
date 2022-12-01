@@ -1,9 +1,6 @@
-const { users, urlDatabase } = require("./data/database");
-
 /**
- * Returns a string of random alphanumeric characters from a given length.
+ * Returns a 6 character long string of random alphanumeric characters.
  * @param  {number} idLength
- * @returns  {string} a 6 character longe alphanumeric string
  */
 const generateRandomString = () => {
   const numbers =  "0123456789";
@@ -19,10 +16,9 @@ const generateRandomString = () => {
 };
 
 /**
- * Validates if the email and passwords fields are empty
+ * Returns a boolean if the email and passwords fields are or are not empty, null or undefined.
  * @param  {string} email
  * @param  {string} password
- * @returns  {boolean} returns a boolean if the email and passwords fields are or are not empty, null or undefined
  */
 const validateFields = (email, password) => {
   if (!email || !password) return false;
@@ -31,7 +27,7 @@ const validateFields = (email, password) => {
 
 /** Returns either the entire user object or null if not found.
  * @param  {string} email
- * @returns  {(null|Object)} either the entire user object or null if not found.
+ * @param  {object} database The database to use to find the user.
  */
 const getUserByEmail = (email, database) => {
   for (const user in database) {
@@ -43,10 +39,11 @@ const getUserByEmail = (email, database) => {
 /**
  * Returns URLs where userID equals id of logged in user.
  * @param  {string} userID
- * @returns  {Object}
+ * @param  {object} database The database to use to find the user's urls.
  */
-const urlsForUser = (userID) => {
-  const asArray = Object.entries(urlDatabase);
+const urlsForUser = (userID, database) => {
+  const asArray = Object.entries(database);
+  // eslint-disable-next-line no-unused-vars
   const filteredURLs = asArray.filter(([key, value]) => value.userID === userID);
   return Object.fromEntries(filteredURLs);
 };
@@ -56,7 +53,6 @@ const urlsForUser = (userID) => {
  * belongs to the user.
  * @param  {Object} urls
  * @param  {string} userID
- * @returns  {boolean}
  */
 const checkIfURLExist = (urls, urlID) => {
   for (const url in urls) {
