@@ -12,13 +12,37 @@ const users = {
 };
 
 const urlDatabase = {
-  b6UTxQ: {
+  vdUTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
+    userID: "userRandomID",
+  },
+  b6Uf2Q: {
+    longURL: "https://www.sportsnet.ca",
+    userID: "userRandomID",
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW",
+    userID: "user2RandomID",
+  },
+  irtoGr: {
+    longURL: "https://www.cnn.com",
+    userID: "user2RandomID",
+  },
+  t6BoGr: {
+    longURL: "https://www.telus.com",
+    userID: "user2RandomID",
+  },
+  i3Btx8: {
+    longURL: "https://www.gmail.com",
+    userID: "user2RandomID",
+  },
+  ikwaGr: {
+    longURL: "https://www.twitter.com",
+    userID: "user2RandomID",
+  },
+  rtBovx: {
+    longURL: "https://www.facebook.com",
+    userID: "user2RandomID",
   },
 };
 
