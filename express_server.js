@@ -29,7 +29,7 @@ app.use(morgan("combined"));
 /** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
-  if (!userID) return res.send("<h2>You need to be logged in to create a new URL.</h2>");
+  if (!userID) return res.status(401).send("<h2>You need to be logged in to create a new URL.</h2>");
 
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
@@ -70,10 +70,10 @@ app.post("/register", (req, res) => {
   const user = getUserByEmail(email);
 
   if (user !== null) {
-    return res.status(400).send("Email already used!");
+    return res.status(400).send("<h2>Email already used!</h2>");
   }
   if (!isValid) {
-    return res.status(400).send("Shall no pass");
+    return res.status(400).send("<h2>Shall no pass</h2>");
   }
 
   users[userID] = {
@@ -90,14 +90,14 @@ app.post("/register", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const urlID = req.params.id;
   const urlExists = checkIfURLExist(urlDatabase, urlID);
-  if (!urlExists) return res.send(`<h2>The URL ${urlID} does not exist.</h2>`);
+  if (!urlExists) return res.status(400).send(`<h2>The URL ${urlID} does not exist.</h2>`);
 
   const user = req.cookies["user_id"];
-  if (!user) return res.send("<h2>Must log in to be able to delete the URL.</h2>");
+  if (!user) return res.status(401).send("<h2>Must log in to be able to delete the URL.</h2>");
 
   const userURLs = urlsForUser(user);
   const isOwn = checkIfURLExist(userURLs, urlID);
-  if (!isOwn) return res.send("<h2>The selected URL does not belong to the user.</h2>");
+  if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
   delete urlDatabase[urlID];
   res.redirect("/urls");
@@ -108,16 +108,16 @@ app.post("/urls/:id", (req, res) => {
   //return error if urlID does not exist
   const urlID = req.params.id;
   const urlExists = checkIfURLExist(urlDatabase, urlID);
-  if (!urlExists) return res.send(`<h2>The URL ${urlID} does not exist.</h2>`);
+  if (!urlExists) return res.status(400).send(`<h2>The URL ${urlID} does not exist.</h2>`);
 
   //should return a relevant error message if the user is not logged in
   const user = req.cookies["user_id"];
-  if (!user) return res.send("<h2>Please log in to view or edit the URL.</h2>");
+  if (!user) return res.status(401).send("<h2>Must log in to be able to edit the URL.</h2>");
 
   // should return a relevant error message if the user does not own the URL
   const userURLs = urlsForUser(user);
   const isOwn = checkIfURLExist(userURLs, urlID);
-  if (!isOwn) return res.send("<h2>Not your URL.</h2>");
+  if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
   const newURL = req.body.newURL;
   urlDatabase[urlID].longURL = newURL;
