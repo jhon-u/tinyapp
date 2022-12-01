@@ -4,6 +4,12 @@
  * users to shorten long URLs (à la bit.ly).
  */
 
+
+const { users, urlDatabase } = require("./data/database");
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+const bcrypt = require("bcryptjs");
 const {
   generateRandomString,
   validateFields,
@@ -11,11 +17,6 @@ const {
   urlsForUser,
   checkIfURLExist
 } = require("./helpers");
-
-const { users, urlDatabase } = require("./data/database");
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const morgan = require("morgan");
 
 const app = express();
 const PORT = 8080;
@@ -46,8 +47,15 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email);
   
   if (user === null) {
-    return res.status(403).send("<h2>Invalid Username or Password!</h2>");
-  } else if (user.password !== password) {
+    return res.status(403).send("<h2>Invalid Username!</h2>");
+  }
+  // if (user.password !== password) {
+  //   return res.status(403).send("<h2>Passwords don't match!</h2>");
+  // }
+
+  const passwordMatch = bcrypt.compareSync(password, user.password);
+  console.log("passwordMatch", passwordMatch);
+  if (!passwordMatch) {
     return res.status(403).send("<h2>Passwords don't match!</h2>");
   }
 
@@ -65,10 +73,10 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const userID = generateRandomString(5);
   const email = req.body.email;
-  const password = req.body.password;
+  const password = bcrypt.hashSync(req.body.password, 10);
   const isValid = validateFields(email, password);
   const user = getUserByEmail(email);
-
+  console.log("PASSWORD", password);
   if (user !== null) {
     return res.status(400).send("<h2>Email already used!</h2>");
   }
@@ -81,6 +89,8 @@ app.post("/register", (req, res) => {
     email,
     password
   };
+
+  console.log("USER", users);
 
   res.cookie("user_id", userID);
   res.redirect("/urls");
