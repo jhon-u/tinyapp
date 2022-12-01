@@ -40,12 +40,24 @@ const getUserByEmail = (email) => {
   return null;
 };
 
+/**
+ * Returns URLs where userID equals id of logged in user.
+ * @param  {string} userID
+ * @returns  {Object}
+ */
 const urlsForUser = (userID) => {
   const asArray = Object.entries(urlDatabase);
   const filteredURLs = asArray.filter(([key, value]) => value.userID === userID);
   return Object.fromEntries(filteredURLs);
 };
 
+/**
+ * Returns a boolean if the URL exists in the database or if the URL
+ * belongs to the user.
+ * @param  {Object} urls
+ * @param  {string} userID
+ * @returns  {boolean}
+ */
 const checkIfURLExist = (urls, urlID) => {
   for (const url in urls) {
     if (url === urlID) return true;
