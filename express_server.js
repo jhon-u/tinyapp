@@ -28,13 +28,14 @@ app.use(morgan("combined"));
 
 /** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
-  const user = req.cookies["user_id"];
-  if (!user) return res.send("<h2>You need to be logged in to create a new URL.</h2>");
+  const userID = req.cookies["user_id"];
+  if (!userID) return res.send("<h2>You need to be logged in to create a new URL.</h2>");
 
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
   
-  urlDatabase[randomStr] = {longURL, user};
+  urlDatabase[randomStr] = {longURL, userID};
+  console.log(urlDatabase);
   res.redirect(`/urls/${randomStr}`);
 });
 
@@ -45,9 +46,9 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email);
   
   if (user === null) {
-    return res.status(403).send("Invalid Username or Password!");
+    return res.status(403).send("<h2>Invalid Username or Password!</h2>");
   } else if (user.password !== password) {
-    return res.status(403).send("Passwords don't match!");
+    return res.status(403).send("<h2>Passwords don't match!</h2>");
   }
 
   res.cookie("user_id", user.id);
@@ -154,7 +155,9 @@ app.get("/urls/:id", (req, res) => {
   const urlID = req.params.id;
   const isOwn = checkIfURLExist(urls, urlID);
   
-  if (!isOwn) return res.send("<h2>Not your URL.</h2>");
+  console.log(urls);
+
+  if (!isOwn) return res.send("<h2>The URL does not belong to the user or does not exist.</h2>");
 
 
   const templateVars = {
