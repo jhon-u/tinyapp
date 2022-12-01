@@ -118,7 +118,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const user = req.session.user_id;
   if (!user) return res.status(401).send("<h2>Must log in to be able to delete the URL.</h2>");
 
-  const userURLs = urlsForUser(user);
+  const userURLs = urlsForUser(user, urlDatabase);
   const isOwn = checkIfURLExist(userURLs, urlID);
   if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
@@ -139,7 +139,7 @@ app.post("/urls/:id", (req, res) => {
   if (!user) return res.status(401).send("<h2>Must log in to be able to edit the URL.</h2>");
 
   // should return a relevant error message if the user does not own the URL
-  const userURLs = urlsForUser(user);
+  const userURLs = urlsForUser(user, urlDatabase);
   const isOwn = checkIfURLExist(userURLs, urlID);
   if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
@@ -152,7 +152,7 @@ app.post("/urls/:id", (req, res) => {
 app.get("/urls", (req, res) => {
   // const user = req.cookies["user_id"];
   const user = req.session.user_id;
-  const urls = urlsForUser(user);
+  const urls = urlsForUser(user, urlDatabase);
   const templateVars = {
     user: users[user],
     urls
@@ -178,7 +178,7 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) return res.send("<h2>Please log in to view or edit the URL.</h2>");
 
-  const urls = urlsForUser(userID);
+  const urls = urlsForUser(userID, urlDatabase);
   const urlID = req.params.id;
   const isOwn = checkIfURLExist(urls, urlID);
   
