@@ -51,7 +51,7 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   
   if (user === null) {
     return res.status(403).send("<h2>Invalid Username!</h2>");
@@ -85,7 +85,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
   const isValid = validateFields(email, password);
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   console.log("PASSWORD", password);
   if (user !== null) {
     return res.status(400).send("<h2>Email already used!</h2>");

@@ -33,9 +33,9 @@ const validateFields = (email, password) => {
  * @param  {string} email
  * @returns  {(null|Object)} either the entire user object or null if not found.
  */
-const getUserByEmail = (email) => {
-  for (const user in users) {
-    if (users[user].email === email) return users[user];
+const getUserByEmail = (email, database) => {
+  for (const user in database) {
+    if (database[user].email === email) return database[user];
   }
   return null;
 };
