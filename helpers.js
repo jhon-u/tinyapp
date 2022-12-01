@@ -1,4 +1,4 @@
-const { users } = require("./data/database");
+const { users, urlDatabase } = require("./data/database");
 
 /**
  * Returns a string of random alphanumeric characters from a given length.
@@ -40,8 +40,24 @@ const getUserByEmail = (email) => {
   return null;
 };
 
+const urlsForUser = (userID) => {
+  const asArray = Object.entries(urlDatabase);
+  const filteredURLs = asArray.filter(([key, value]) => value.userID === userID);
+  return Object.fromEntries(filteredURLs);
+};
+
+const checkIfURLExist = (urls, urlID) => {
+  for (const url in urls) {
+    if (url === urlID) return true;
+  }
+  return false;
+};
+
+
 module.exports = {
   generateRandomString,
   validateFields,
-  getUserByEmail
+  getUserByEmail,
+  urlsForUser,
+  checkIfURLExist
 };
