@@ -4,7 +4,14 @@
  * users to shorten long URLs (à la bit.ly).
  */
 
-const { generateRandomString, validateFields, getUserByEmail } = require("./helpers");
+const {
+  generateRandomString,
+  validateFields,
+  getUserByEmail,
+  urlsForUser,
+  checkIfURLExist
+} = require("./helpers");
+
 const { users, urlDatabase } = require("./data/database");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -22,10 +29,8 @@ app.use(morgan("combined"));
 /** Route to handle a POST to /urls. */
 app.post("/urls", (req, res) => {
   const user = req.cookies["user_id"];
-  if (!user) {
-    res.set("Content-Type", "text/html");
-    return res.send("<h2>You need to be logged in to create a new URL.</h2>");
-  }
+  if (!user) return res.send("<h2>You need to be logged in to create a new URL.</h2>");
+
   const randomStr = generateRandomString(6);
   const longURL = req.body.longURL;
   
@@ -82,25 +87,49 @@ app.post("/register", (req, res) => {
 
 /** Removes an existing shortened URLs from our database. */
 app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id;
-  delete urlDatabase[id];
+  const urlID = req.params.id;
+  const urlExists = checkIfURLExist(urlDatabase, urlID);
+  if (!urlExists) return res.send(`<h2>The URL ${urlID} does not exist.</h2>`);
+
+  const user = req.cookies["user_id"];
+  if (!user) return res.send("<h2>Must log in to be able to delete the URL.</h2>");
+
+  const userURLs = urlsForUser(user);
+  const isOwn = checkIfURLExist(userURLs, urlID);
+  if (!isOwn) return res.send("<h2>The selected URL does not belong to the user.</h2>");
+
+  delete urlDatabase[urlID];
   res.redirect("/urls");
 });
 
 /** Updates an existing long URL in our database. */
 app.post("/urls/:id", (req, res) => {
+  //return error if urlID does not exist
+  const urlID = req.params.id;
+  const urlExists = checkIfURLExist(urlDatabase, urlID);
+  if (!urlExists) return res.send(`<h2>The URL ${urlID} does not exist.</h2>`);
+
+  //should return a relevant error message if the user is not logged in
+  const user = req.cookies["user_id"];
+  if (!user) return res.send("<h2>Please log in to view or edit the URL.</h2>");
+
+  // should return a relevant error message if the user does not own the URL
+  const userURLs = urlsForUser(user);
+  const isOwn = checkIfURLExist(userURLs, urlID);
+  if (!isOwn) return res.send("<h2>Not your URL.</h2>");
+
   const newURL = req.body.newURL;
-  const id = req.params.id;
-  urlDatabase[id] = newURL;
+  urlDatabase[urlID].longURL = newURL;
   res.redirect("/urls");
 });
 
 /** GET route to view all the shorten and long URLs. */
 app.get("/urls", (req, res) => {
   const user = req.cookies["user_id"];
+  const urls = urlsForUser(user);
   const templateVars = {
     user: users[user],
-    urls: urlDatabase
+    urls
   };
   res.render("urls_index", templateVars);
 });
@@ -118,23 +147,32 @@ app.get("/urls/new", (req, res) => {
 
 /** GET route to load individual shortened URLs. */
 app.get("/urls/:id", (req, res) => {
-  const user = req.cookies["user_id"];
-  const id = req.params.id;
+  const userID = req.cookies["user_id"];
+  if (!userID) return res.send("<h2>Please log in to view or edit the URL.</h2>");
+
+  const urls = urlsForUser(userID);
+  const urlID = req.params.id;
+  const isOwn = checkIfURLExist(urls, urlID);
+  
+  if (!isOwn) return res.send("<h2>Not your URL.</h2>");
+
+
   const templateVars = {
-    id,
-    longURL: urlDatabase[id].longURL,
-    user: users[user],
+    urlID,
+    longURL: urlDatabase[urlID].longURL,
+    user: users[userID],
   };
+
   res.render("urls_show", templateVars);
 });
 
 /** Redirect any request to "/u/:id" to its longURL. */
 app.get("/u/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
+  const urlID = req.params.id;
+  const longURL = urlDatabase[urlID].longURL;
   if (!longURL) {
     res.set("Content-Type", "text/html");
-    return res.send(`<h2>The short URL ${id} does not exist.</h2>`);
+    return res.send(`<h2>The short URL ${urlID} does not exist.</h2>`);
   }
   
   res.redirect(longURL);
