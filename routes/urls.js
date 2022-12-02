@@ -13,10 +13,10 @@ router
     res.redirect(`/urls/${randomStr}`);
   })
   .get("/", (req, res) => {
-    const user = req.session.userID;
-    const urls = urlsForUser(user, urlDatabase);
+    const userID = req.session.userID;
+    const urls = urlsForUser(userID, urlDatabase);
     const templateVars = {
-      user: users[user],
+      user: users[userID],
       urls
     };
     res.render("urls_index", templateVars);
@@ -28,10 +28,10 @@ router
     const urlExists = checkIfURLExist(urlDatabase, urlID);
     if (!urlExists) return res.status(400).send(`<h2>The URL ${urlID} does not exist.</h2>`);
 
-    const user = req.session.userID;
-    if (!user) return res.status(401).send("<h2>Must log in to be able to delete the URL.</h2>");
+    const userID = req.session.userID;
+    if (!userID) return res.status(401).send("<h2>Must log in to be able to delete the URL.</h2>");
 
-    const userURLs = urlsForUser(user, urlDatabase);
+    const userURLs = urlsForUser(userID, urlDatabase);
     const isOwn = checkIfURLExist(userURLs, urlID);
     if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
@@ -45,10 +45,10 @@ router
     const urlExists = checkIfURLExist(urlDatabase, urlID);
     if (!urlExists) return res.status(400).send(`<h2>The URL ${urlID} does not exist.</h2>`);
 
-    const user = req.session.userID;
-    if (!user) return res.status(401).send("<h2>Must log in to be able to edit the URL.</h2>");
+    const userID = req.session.userID;
+    if (!userID) return res.status(401).send("<h2>Must log in to be able to edit the URL.</h2>");
 
-    const userURLs = urlsForUser(user, urlDatabase);
+    const userURLs = urlsForUser(userID, urlDatabase);
     const isOwn = checkIfURLExist(userURLs, urlID);
     if (!isOwn) return res.status(403).send("<h2>The selected URL does not belong to the user.</h2>");
 
@@ -59,10 +59,10 @@ router
 
   /** GET route to add new URLs. */
   .get("/new", (req, res) => {
-    const user = req.session.userID;
-    if (!user) return res.redirect("/login");
+    const userID = req.session.userID;
+    if (!userID) return res.redirect("/login");
     const templateVars = {
-      user: users[user],
+      user: users[userID],
       urls: urlDatabase
     };
     res.render("urls_new", templateVars);

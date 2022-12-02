@@ -21,14 +21,23 @@ app.use(cookieSession({
   keys: ["the_league", "passified"],
 }));
 
+/** Main Routes */
 const urls = require("./routes/urls");
 const login = require("./routes/login");
 const logout = require("./routes/logout");
 const register = require("./routes/register");
+
 app.use("/urls", urls);
 app.use("/login", login);
 app.use("/logout", logout);
 app.use("/register", register);
+
+/** Redirects the user to the login page if not already logged in, or to the /URLs if already logged in. */
+app.get("/", (req, res) => {
+  const userID = req.session.userID;
+  if (!userID) return res.redirect("/login");
+  res.redirect("/urls");
+});
 
 /** Redirect any request to "/u/:id" to its longURL. */
 app.get("/u/:id", (req, res) => {
