@@ -243,6 +243,12 @@ app.get("/login", (req, res) => {
   req.session.errors = null;
 });
 
+app.use((req,res,next)=>{
+  const user = req.session.user_id;
+  const templateVars = { user: users[user] };
+  res.status(404).render("404", templateVars);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
