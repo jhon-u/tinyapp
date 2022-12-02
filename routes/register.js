@@ -24,10 +24,9 @@ router
   ], (req, res) => {
 
     const errors = validationResult(req);
-    console.log(errors.array());
     if (!errors.isEmpty()) {
       const templateVars = {
-        user: users[req.session.user_id],
+        user: users[req.session.userID],
         errors: errors.array()
       };
       res.status(403);
@@ -40,15 +39,13 @@ router
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10)
     };
-    console.log(users);
-    // eslint-disable-next-line camelcase
-    req.session.user_id = userID;
+    req.session.userID = userID;
     res.redirect("/urls");
   })
 
   /** GET route to handle reqeusts to /register. */
   .get("/", (req, res) => {
-    const user = req.session.user_id;
+    const user = req.session.userID;
     if (user) return res.redirect("/urls");
     const templateVars = {
       user: users[user],

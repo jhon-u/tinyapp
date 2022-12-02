@@ -8,14 +8,12 @@ let router = express.Router();
 router
   /** GET route to handle reqeusts to /login. */
   .get("/", (req, res) => {
-    console.log("INSIDE THE ROUTER");
-    const user = req.session.user_id;
+    const user = req.session.userID;
     if (user) return res.redirect("/urls");
     const templateVars = {
       user: users[user],
       errors: null
     };
-    console.log(templateVars);
     res.render("login", templateVars);
     req.session.errors = null;
   })
@@ -38,10 +36,9 @@ router
       })
   ],(req, res) => {
     const errors = validationResult(req);
-    console.log(errors.array());
     if (!errors.isEmpty()) {
       const templateVars = {
-        user: users[req.session.user_id],
+        user: users[req.session.userID],
         errors: errors.array()
       };
       res.status(403);
@@ -50,7 +47,7 @@ router
     
     const email = req.body.email;
     const user = getUserByEmail(email, users);
-    req.session.user_id = user.id;
+    req.session.userID = user.id;
     res.redirect("/urls");
   });
 
