@@ -10,6 +10,7 @@ const express = require("express");
 const morgan = require("morgan");
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
+const { body, check, validationResult } = require("express-validator");
 
 const { users, urlDatabase } = require("./data/database");
 const {
@@ -48,33 +49,42 @@ app.post("/urls", (req, res) => {
 });
 
 /** Route to handle a POST to /login. */
-app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const user = getUserByEmail(email, users);
+app.post("/login",[
+  check("email").notEmpty().withMessage("The email field cannot be empty!"),
+  body("password")
+    .notEmpty()
+    .custom((value, { req }) => {
+      const email = req.body.email;
+      const user = getUserByEmail(email, users);
+      if (user === null) {
+        throw new Error("The email entered does not exist.");
+      }
+      const passwordMatch = bcrypt.compareSync(value, user.password);
+      if (!passwordMatch) {
+        throw new Error("Passwords do not match.");
+      }
+      return true;
+    })
+],(req, res) => {
+  let errors = validationResult(req);
   
-  if (user === null) {
-    return res.status(403).send("<h2>Invalid Username!</h2>");
+  if (!errors.isEmpty()) {
+    const templateVars = {
+      user: users[req.session.user_id],
+      errors: errors.array()
+    };
+    res.status(403);
+    return res.render("login", templateVars);
   }
-  // if (user.password !== password) {
-  //   return res.status(403).send("<h2>Passwords don't match!</h2>");
-  // }
-
-  const passwordMatch = bcrypt.compareSync(password, user.password);
-  console.log("passwordMatch", passwordMatch);
-  if (!passwordMatch) {
-    return res.status(403).send("<h2>Passwords don't match!</h2>");
-  }
-
-  // res.cookie("user_id", user.id);
-  // eslint-disable-next-line camelcase
+    
+  const email = req.body.email;
+  const user = getUserByEmail(email, users);
   req.session.user_id = user.id;
   res.redirect("/urls");
 });
 
 /** Route to handle a POST to /logout. */
 app.post("/logout", (req, res) => {
-  // res.clearCookie("user_id");
   req.session = null;
   res.redirect("/login");
 });
@@ -225,9 +235,12 @@ app.get("/login", (req, res) => {
   const user = req.session.user_id;
   if (user) return res.redirect("/urls");
   const templateVars = {
-    user: users[user]
+    user: users[user],
+    errors: null
   };
+  console.log(templateVars);
   res.render("login", templateVars);
+  req.session.errors = null;
 });
 
 app.listen(PORT, () => {
