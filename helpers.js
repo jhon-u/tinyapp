@@ -54,7 +54,6 @@ const checkIfURLExist = (urls, urlID) => {
 
 module.exports = {
   generateRandomString,
-  validateFields,
   getUserByEmail,
   urlsForUser,
   checkIfURLExist
