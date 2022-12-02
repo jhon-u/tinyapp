@@ -1,5 +1,5 @@
-const { users, urlDatabase } = require("../data/database");
-const { getUserByEmail, urlsForUser } = require("../helpers");
+const { users } = require("../data/database");
+const { getUserByEmail } = require("../helpers");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const { body, check, validationResult } = require("express-validator");
@@ -37,7 +37,7 @@ router
         return true;
       })
   ],(req, res) => {
-    let errors = validationResult(req);
+    const errors = validationResult(req);
     console.log(errors.array());
     if (!errors.isEmpty()) {
       const templateVars = {
