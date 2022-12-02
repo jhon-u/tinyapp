@@ -15,16 +15,6 @@ const generateRandomString = () => {
   return result;
 };
 
-/**
- * Returns a boolean if the email and passwords fields are or are not empty, null or undefined.
- * @param  {string} email
- * @param  {string} password
- */
-const validateFields = (email, password) => {
-  if (!email || !password) return false;
-  return true;
-};
-
 /** Returns either the entire user object or null if not found.
  * @param  {string} email
  * @param  {object} database The database to use to find the user.
