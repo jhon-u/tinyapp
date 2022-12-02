@@ -17,17 +17,29 @@
     <div class="row d-flex justify-content-center align-items-center">
       <main class="container" style=" margin: 1em;">
         <h3 class="text-center">Login</h3>
-        <form class="form-group" action=" /login" method="POST">
-          <div class="form-group">
-            <label for="email">Email address</label>
-            <input type="email" class="form-control" name="email" placeholder="Enter email">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+
+        <% if(errors) { %>
+          <% for (let error in errors) { %>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <%= errors[error].msg %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <% } %>
+              <% } %>
+                <form class="form-group" action=" /login" method="POST">
+                  <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" name="email" placeholder="Enter email">
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Password">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
       </main>
     </div>
 
